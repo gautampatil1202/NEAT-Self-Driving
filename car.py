@@ -64,7 +64,6 @@ class Car:
                 omega = radians(self.rot + 45*k)
                 dx = s * sin(omega)
                 dy = - s * cos(omega)
-                #disegna intersezioni dei sensori
                 if s < SENSOR_DISTANCE:
                     py.draw.circle(world.win, RED, world.getScreenCoords(self.x+dx, self.y+dy), 6)
 

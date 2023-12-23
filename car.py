@@ -10,7 +10,7 @@ from vect2d import vect2d
 
 class Car:
     x = 0
-    y = 0       #coordinate rispetto al sistema di riferimento globale, la posizione sullo schermo è relativa alla posizione della macchina migliore
+    y = 0       #coordinates with respect to the global reference system, the position on the screen is relative to the best machine position
 
 
     def __init__(self, x, y, turn):
@@ -25,7 +25,7 @@ class Car:
 
     def initImgs(self):
         img_names = ["yellow_car.png", "red_car.png", "blu_car.png", "green_car.png"]
-        name = img_names[floor(random()*len(img_names))%len(img_names)]                 #prendi a caso una di queste immagini
+        name = img_names[floor(random()*len(img_names))%len(img_names)]                 #take one of these images at random
 
         self.img = py.transform.rotate(py.transform.scale(py.image.load(os.path.join("imgs", name)).convert_alpha(), (120,69)), -90)
         self.brake_img = py.transform.rotate(py.transform.scale(py.image.load(os.path.join("imgs", "brakes.png")).convert_alpha(), (120,69)), -90)
@@ -45,7 +45,7 @@ class Car:
                     continue
         return False
 
-    def getInputs(self, world, road):         #win serve per disegnare i sensori se DBG = True
+    def getInputs(self, world, road):         #win is used to draw the sensors if DBG = True
         sensors = []
         for k in range(8):
             sensors.append(SENSOR_DISTANCE)
@@ -100,7 +100,7 @@ class Car:
         if self.vel < 0:
             self.vel = 0
         self.x = self.x + self.vel * sin(radians(self.rot))
-        self.y = self.y - self.vel * cos(radians(self.rot)) #sottraggo perchè l'origine è in alto a sinistra
+        self.y = self.y - self.vel * cos(radians(self.rot))  #subtract because the origin is at the top left
 
         #print("coord: ("+str(self.x)+", "+str(self.y)+")   vel: "+str(self.vel)+"   acc: "+str(self.acc) + "    rot: "+str(self.rot))
 
@@ -119,21 +119,21 @@ class Car:
 
     #======================== LOCAL FUNCTIONS ==========================
 
-def getSensorEquations(self, world):       #restituisce le equazioni delle rette (in variabile y) della macchina in ordine [verticale, diagonale crescente, orizzontale, diagonale decrescente]
+def getSensorEquations(self, world):       
     eq = []
     for i in range(4):
         omega = radians(self.rot + 45*i)
         dx = SENSOR_DISTANCE * sin(omega)
         dy = - SENSOR_DISTANCE * cos(omega)
 
-        if CAR_DBG:             #disegna linee dei sensori
+        if CAR_DBG:             
             py.draw.lines(world.win, GREEN, False, [world.getScreenCoords(self.x+dx, self.y+dy), world.getScreenCoords(self.x-dx, self.y-dy)], 2)
 
         coef = getSegmentEquation(self, vect2d(x = self.x+dx, y = self.y+dy))
         eq.append(coef)
     return eq
 
-def getSegmentEquation(p, q):          #equazioni in variabile y tra due punti (tenendo conto del sistema di coordinate con y invertito) nella forma generale ax + by + c =  0
+def getSegmentEquation(p, q):          #equations in variable y between two points (taking into account the coordinate system with y inverted) in the general form ax + by + c = 0
 
     a = p.y - q.y
     b = q.x -p.x
@@ -141,7 +141,7 @@ def getSegmentEquation(p, q):          #equazioni in variabile y tra due punti (
 
     return (a,b,c)
 
-def getDistance(world, car, sensors, sensorsEquations, p, q):     #dato il segmento (m,q) calcolo la distanza e la metto nel sensore corrispondente
+def getDistance(world, car, sensors, sensorsEquations, p, q):     #given the segment (m,q) I calculate the distance and put it in the corresponding sensor
     (a2,b2,c2) = getSegmentEquation(p, q)
 
     for i,(a1,b1,c1) in enumerate(sensorsEquations):
@@ -153,17 +153,17 @@ def getDistance(world, car, sensors, sensorsEquations, p, q):     #dato il segme
                 continue
             y = (a1*c2 - c1*a2)/d
             x = (c1*b2 - b1*c2)/d
-            if (y-p.y)*(y-q.y) > 0 or (x-p.x)*(x-q.x) > 0:        #se l'intersezione non sta tra a e b, vai alla prossima iterazione
-                continue
-        else:       #rette coincidenti
+            if (y-p.y)*(y-q.y) > 0 or (x-p.x)*(x-q.x) > 0:
+                
+        else:       
             (x, y) = (abs(p.x-q.x), abs(p.y-q.y))
 
         #get distance
         dist = ((car.x - x)**2 + (car.y - y)**2)**0.5
 
-        #inserisci nel sensore nel verso giusto
-        omega = car.rot +45*i                               #angolo della retta del sensore (e del suo opposto)
-        alpha = 90- degrees(atan2(car.y - y, x-car.x))     #angolo rispetto alla verticale (come car.rot)
+    
+        omega = car.rot +45*i                               
+        alpha = 90- degrees(atan2(car.y - y, x-car.x))     
         if cos(alpha)*cos(omega)*100 + sin(alpha)*sin(omega)*100 > 0:
             index = i
         else:
